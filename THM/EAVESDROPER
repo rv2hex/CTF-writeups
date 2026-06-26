@@ -22,12 +22,12 @@ Nmap done: 1 IP address (1 host up) scanned in 0.98 seconds
 
 2- using the provided id_rsa key to connect to the 'frank' user using ssh after giving the key permissions using chmod 600.
 
-$chmod 400 ./id-rsa-1647296932800.id-rsa
-$ ssh -i id-rsa-1647296932800.id-rsa frank@10.48.165.220
+$chmod 400 ./id-rsa-164729693200.id-rsa
+$ ssh -i id-rsa-164729693200.id-rsa frank@10.48.165.220
 
 
 The authenticity of host '10.48.165.220 (10.48.165.220)' can't be established.
-ED25519 key fingerprint is SHA256:WaKDmh6WMRiZ/ysLM5UQM/UirbKKHGy+jRJ5euxQS84.
+ED25519 key fingerprint is SHA256:WaKDmh6WMRiZ/ysLM5UQM/UirbKKHGy+sSCPMC.
 This key is not known by any other names.
 Are you sure you want to continue connecting (yes/no/[fingerprint])? ywa
 Please type 'yes', 'no' or the fingerprint: yes
@@ -96,5 +96,5 @@ and then we get frank password!!!
 6- final, after running sudo
 
 $cat pass.txt
-!@#frankisawesome2022%*
+!@#{REACTED}*
 $sudo bash

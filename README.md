@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./banner.svg" alt="CTF_WRITEUPS banner" width="100%" />
+</div>
+
 # CTF Writeups
 
 Personal writeups for CTF rooms. Raw notes taken during solves — follow along
